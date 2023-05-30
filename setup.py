@@ -20,7 +20,6 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'talker = ros2_streamer.publisher_member_function:main',
             'service = ros2_streamer.gstreamer_service:main',
 
         ],
