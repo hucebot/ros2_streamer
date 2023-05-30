@@ -3,9 +3,11 @@
 <package format="3">
   <name>ros2_streamer</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="root@todo.todo">root</maintainer>
-  <license>TODO: License declaration</license>
+  <description>A ROS2 "interface" to gst_launch</description>
+  <maintainer email="jean-baptiste.mouret@inria.fr">JB Mouret</maintainer>
+  <license>MIT</license>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

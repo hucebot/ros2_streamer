@@ -13,13 +13,16 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='root',
-    maintainer_email='root@todo.todo',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    maintainer='JB Mouret',
+    maintainer_email='jean-baptiste.mouret@inria.fr',
+    description='A ROS2 "interface" to gst_launch',
+    license='MIT',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'talker = ros2_streamer.publisher_member_function:main',
+            'service = ros2_streamer.gstreamer_service:main',
+
         ],
     },
 )
