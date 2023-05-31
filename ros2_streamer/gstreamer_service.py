@@ -1,6 +1,11 @@
 # python
 import time
 
+# Gstreamer
+import gi
+gi.require_version('Gst', '1.0')
+from gi.repository import Gst #,GstRtp,GstRtsp,GObject
+import subprocess
 
 # ROS2
 import rclpy
@@ -8,37 +13,41 @@ from rclpy.node import Node
 from builtin_interfaces.msg import Time
 from rcl_interfaces.msg import SetParametersResult
 
-# Gstreamer
-import gi
-gi.require_version('Gst', '1.0')
-from gi.repository import Gst #,GstRtp,GstRtsp,GObject
 #import yaml
 #import sys
 
 class GstreamerService(Node):
 
     def __init__(self):
+        print('---')
         super().__init__('gstreamer_service')
+        print('init')
         self.get_logger().info('Gstreamer service is starting...')
 
         self.declare_parameter('rtp_port', 5000)
-        self.declare_parameter('rtp_host', '192.168.1.141')
+        self.declare_parameter('rtp_dest', '192.168.1.141')
         self.declare_parameter('source', 'videotestsrc pattern=ball is-live=true')
+        self.declare_parameter('ntp_server', 'time.apple.com')
+
         self.declare_parameter('bitrate', 1000)
         
         self.declare_parameter('local_time_frequency', 10)
         self.add_on_set_parameters_callback(self.parameters_callback)
 
-        # service : restart
-        # service : ntp
-
         # topic : clock
+        self.ntp_sync(self.get_parameter('ntp_server').get_parameter_value().string_value)
         self.pub_clock = self.create_publisher(Time, '/gstreamer_service/local_time', 1)
         self.timer_pub_clock = self.create_timer(1.0 / 10.0, self.publish_time)
 
         self._init_gstreamer()
+        self.need_reinit = False
+        self.timer_reinit = self.create_timer(1.0 / 50.0, self.reinit)
 
         self.get_logger().info('Gstreamer service is started')
+
+    def ntp_sync(self, server):
+        print('syncing clock (this might take a few secs...)')
+        subprocess.Popen(['ntpdate', server])
 
     def publish_time(self):
         # https://docs.ros2.org/foxy/api/builtin_interfaces/msg/Time.html
@@ -48,6 +57,12 @@ class GstreamerService(Node):
         msg.nanosec = t - msg.sec * 1_000_000_000
         self.pub_clock.publish(msg)
 
+    def reinit(self):
+        if self.need_reinit:
+            self.need_reinit = False
+            self.pipeline.set_state(Gst.State.NULL)
+            self.pipeline = None
+            self._init_gstreamer()
 
     def parameters_callback(self, params):
         for p in params:
@@ -56,8 +71,10 @@ class GstreamerService(Node):
                 self.timer_pub_clock.destroy()        
                 self.timer_pub_clock = self.create_timer(1.0 / f, self.publish_time)
                 self.get_logger().info(f'Setting local time frequency to {f} Hz')
+            elif p.name == 'ntp_server':
+                self.ntp_sync(p.value)
             else:
-                self._init_gstreamer()
+                self.need_reinit = True
         return SetParametersResult(successful=True)
 
 
@@ -65,14 +82,14 @@ class GstreamerService(Node):
         self.get_logger().info('Initializing gstreamer...')
 
         source = self.get_parameter('source').get_parameter_value().string_value
-        rtp_host = self.get_parameter('rtp_host').get_parameter_value().string_value
+        rtp_dest = self.get_parameter('rtp_dest').get_parameter_value().string_value
         rtp_port = self.get_parameter('rtp_port').get_parameter_value().integer_value
 
         pipeline_string = f"{source} \
         ! x264enc tune=zerolatency bitrate=100 speed-preset=superfast \
-        ! h264parse \
+        ! queue ! h264parse \
         ! rtph264pay ! queue \
-        ! udpsink host={rtp_host} port={rtp_port} sync=true async=false"
+        ! udpsink host={rtp_dest} port={rtp_port} sync=true async=false"
 
         print("Gstreamer pipeline:", pipeline_string.replace("\n"," "))
         self.pipeline = None

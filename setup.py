@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'service = ros2_streamer.gstreamer_service:main',
+            'test_sub = ros2_streamer.test_sub:main',
 
         ],
     },
