@@ -25,8 +25,9 @@ class GstreamerService(Node):
         self.get_logger().info('Gstreamer service is starting...')
 
         self.declare_parameter('rtp_port', 5000)
-        self.declare_parameter('rtp_dest', '192.168.1.141')
-        self.declare_parameter('source', 'videotestsrc pattern=ball is-live=true')
+        self.declare_parameter('rtp_dest', '192.168.1.116')
+        self.declare_parameter('device', '/dev/video0')
+        
         self.declare_parameter('ntp_server', 'time.apple.com')
 
         self.declare_parameter('bitrate', 1000)
@@ -81,13 +82,11 @@ class GstreamerService(Node):
     def _init_gstreamer(self):
         self.get_logger().info('Initializing gstreamer...')
 
-        source = self.get_parameter('source').get_parameter_value().string_value
+        device = self.get_parameter('device').get_parameter_value().string_value
         rtp_dest = self.get_parameter('rtp_dest').get_parameter_value().string_value
         rtp_port = self.get_parameter('rtp_port').get_parameter_value().integer_value
-
-        pipeline_string = f"{source} \
-        ! x264enc tune=zerolatency bitrate=100 speed-preset=superfast \
-        ! queue ! h264parse \
+        
+        pipeline_string = f"v4l2src device={device} ! video/x-h264,width=1280,height=720 \
         ! rtph264pay ! queue \
         ! udpsink host={rtp_dest} port={rtp_port} sync=true async=false"
 
