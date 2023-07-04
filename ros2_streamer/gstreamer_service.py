@@ -1,5 +1,6 @@
 # python
 import time
+import signal
 
 # Gstreamer
 import gi
@@ -57,6 +58,9 @@ class GstreamerService(Node):
 
         self.get_logger().info('Gstreamer ROS2 service is started')
 
+
+  
+
     def _init_ros(self):
         device = self.get_parameter('device').get_parameter_value().string_value.split('/')[-1]
         name = self.get_name()
@@ -100,6 +104,10 @@ class GstreamerService(Node):
             del self.pipeline
             self.pipeline = None
             self._init_gstreamer()
+
+    def stop_node(self, **args):
+        self.pipeline.set_state(Gst.State.NULL)
+        self.pipeline = None
 
     def parameters_callback(self, params):
         for p in params:
@@ -273,15 +281,21 @@ def main():
     print("main")
     rclpy.init()
     service = GstreamerService()
-#    rclpy.spin(service)
+    # signals
+    def sighandler(*args):
+        service.stop_node()
+        service.destroy_node()
+        sys.exit(0)
+#        rclpy.shutdown()
+    signal.signal(signal.SIGINT, sighandler)
+    signal.signal(signal.SIGTERM, sighandler)
     while True:
-            if not service.check_messages():
-                time.sleep(1.0)
+            if not service.check_messages(): # gstreamer error
+                time.sleep(0.2)
                 service.reinit(True)
-                time.sleep(1.0)
+                time.sleep(0.2)
             rclpy.spin_once(service)
             time.sleep(0.001)
-    rclpy.shutdown()
 
 
 if __name__ == '__main__':
