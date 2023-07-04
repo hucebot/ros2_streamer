@@ -26,7 +26,8 @@ class GstreamerService(Node):
 
     def __init__(self):
         print('---')
-        super().__init__('gstreamer_service')
+        name = 'gstreamer_service'
+        super().__init__(name)
 
         print('init')
         self.get_logger().info('Gstreamer service is starting...')
@@ -58,21 +59,22 @@ class GstreamerService(Node):
 
     def _init_ros(self):
         device = self.get_parameter('device').get_parameter_value().string_value.split('/')[-1]
+        name = self.get_name()
 
         # publisher : clock
         self.ntp_sync(self.get_parameter('ntp_server').get_parameter_value().string_value)
-        self.pub_clock = self.create_publisher(Time, f'/{device}/local_time', 1)
+        self.pub_clock = self.create_publisher(Time, f'/{name}/local_time', 1)
         local_time_frequency = self.get_parameter('local_time_frequency').get_parameter_value().integer_value
         self.timer_pub_clock = self.create_timer(1.0 / local_time_frequency, self.publish_time)
 
         # topics are not created if this is not a pan/tilt camera
         if self.is_pantilt:
             # subscriber : pan/tilt
-            self.sub_pan = self.create_subscription(Float64, f'/{device}/pan', self.pan_callback, 1)
+            self.sub_pan = self.create_subscription(Float64, f'/{name}/pan', self.pan_callback, 1)
             self.sub_tilt = self.create_subscription(Float64, f'/{device}/tilt', self.tilt_callback, 1)
 
-            self.pub_pan = self.create_publisher(Float64, f'/{device}/current_pan', 1)
-            self.pub_tilt = self.create_publisher(Float64, f'/{device}/current_tilt', 1)
+            self.pub_pan = self.create_publisher(Float64, f'/{name}/current_pan', 1)
+            self.pub_tilt = self.create_publisher(Float64, f'/{name}/current_tilt', 1)
             pan_tilt_frequency = self.get_parameter('pan_tilt_frequency').get_parameter_value().integer_value
             self.timer_pub_pan = self.create_timer(1.0 / pan_tilt_frequency, self.publish_pan)
             self.timer_pub_tilt = self.create_timer(1.0 / pan_tilt_frequency, self.publish_tilt)
