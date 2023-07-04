@@ -65,12 +65,12 @@ class GstreamerService(Node):
         local_time_frequency = self.get_parameter('local_time_frequency').get_parameter_value().integer_value
         self.timer_pub_clock = self.create_timer(1.0 / local_time_frequency, self.publish_time)
 
-        # subscriber : pan/tilt
-        self.sub_pan = self.create_subscription(Float64, f'/{device}/pan', self.pan_callback, 1)
-        self.sub_tilt = self.create_subscription(Float64, f'/{device}/tilt', self.tilt_callback, 1)
-
-        # publisher : current pan/tilt
+        # topics are not created if this is not a pan/tilt camera
         if self.is_pantilt:
+            # subscriber : pan/tilt
+            self.sub_pan = self.create_subscription(Float64, f'/{device}/pan', self.pan_callback, 1)
+            self.sub_tilt = self.create_subscription(Float64, f'/{device}/tilt', self.tilt_callback, 1)
+
             self.pub_pan = self.create_publisher(Float64, f'/{device}/current_pan', 1)
             self.pub_tilt = self.create_publisher(Float64, f'/{device}/current_tilt', 1)
             pan_tilt_frequency = self.get_parameter('pan_tilt_frequency').get_parameter_value().integer_value
