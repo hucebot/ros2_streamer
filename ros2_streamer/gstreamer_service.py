@@ -75,13 +75,15 @@ class GstreamerService(Node):
         if self.is_pantilt:
             # subscriber : pan/tilt
             self.sub_pan = self.create_subscription(Float64, f'/{name}/pan', self.pan_callback, 1)
-            self.sub_tilt = self.create_subscription(Float64, f'/{device}/tilt', self.tilt_callback, 1)
+            self.sub_tilt = self.create_subscription(Float64, f'/{name}/tilt', self.tilt_callback, 1)
 
             self.pub_pan = self.create_publisher(Float64, f'/{name}/current_pan', 1)
             self.pub_tilt = self.create_publisher(Float64, f'/{name}/current_tilt', 1)
             pan_tilt_frequency = self.get_parameter('pan_tilt_frequency').get_parameter_value().integer_value
             self.timer_pub_pan = self.create_timer(1.0 / pan_tilt_frequency, self.publish_pan)
             self.timer_pub_tilt = self.create_timer(1.0 / pan_tilt_frequency, self.publish_tilt)
+        else:
+            self.get_logger().warning("No pan/tilt detected")
 
     def ntp_sync(self, server):
         print('syncing clock (this might take a few secs...)')
@@ -253,20 +255,11 @@ class GstreamerService(Node):
         self.get_logger().info('Initializing gstreamer...')
         device = self.get_parameter('device').get_parameter_value().string_value
 
-<<<<<<< HEAD
-        device = self.get_parameter('device').get_parameter_value().string_value
-        rtp_dest = self.get_parameter('rtp_dest').get_parameter_value().string_value
-        rtp_port = self.get_parameter('rtp_port').get_parameter_value().integer_value
-        
-        pipeline_string = f"v4l2src device={device} ! video/x-h264,width=1280,height=720 \
-        ! rtph264pay ! queue \
-=======
         rtp_dest = self.get_parameter('rtp_dest').get_parameter_value().string_value
         rtp_port = self.get_parameter('rtp_port').get_parameter_value().integer_value
         
         pipeline_string = f"v4l2src device={device}  ! video/x-h264,width=1280,height=720 \
         ! rtph264pay  \
->>>>>>> 3f9c70c2d6c3ef6d28b8e8fceca9aa7f4935508c
         ! udpsink host={rtp_dest} port={rtp_port} sync=true async=false"
 
         print("Gstreamer pipeline:", pipeline_string.replace("\n"," "))
