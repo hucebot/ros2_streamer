@@ -35,8 +35,8 @@ class GstreamerService(Node):
 
         # parameters
         self.declare_parameter('rtp_port', 5000)
-        self.declare_parameter('rtp_dest', '192.168.1.141')
-        self.declare_parameter('device', '/dev/video4')
+        self.declare_parameter('rtp_dest', '192.168.1.117')
+        self.declare_parameter('device', '/dev/video0')
         self.declare_parameter('ntp_server', 'time.apple.com')
         self.declare_parameter('bitrate', 1000)
         self.declare_parameter('local_time_frequency', 10)
@@ -75,13 +75,15 @@ class GstreamerService(Node):
         if self.is_pantilt:
             # subscriber : pan/tilt
             self.sub_pan = self.create_subscription(Float64, f'/{name}/pan', self.pan_callback, 1)
-            self.sub_tilt = self.create_subscription(Float64, f'/{device}/tilt', self.tilt_callback, 1)
+            self.sub_tilt = self.create_subscription(Float64, f'/{name}/tilt', self.tilt_callback, 1)
 
             self.pub_pan = self.create_publisher(Float64, f'/{name}/current_pan', 1)
             self.pub_tilt = self.create_publisher(Float64, f'/{name}/current_tilt', 1)
             pan_tilt_frequency = self.get_parameter('pan_tilt_frequency').get_parameter_value().integer_value
             self.timer_pub_pan = self.create_timer(1.0 / pan_tilt_frequency, self.publish_pan)
             self.timer_pub_tilt = self.create_timer(1.0 / pan_tilt_frequency, self.publish_tilt)
+        else:
+            self.get_logger().warning("No pan/tilt detected")
 
     def ntp_sync(self, server):
         print('syncing clock (this might take a few secs...)')

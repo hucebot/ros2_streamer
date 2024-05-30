@@ -17,8 +17,9 @@ RUN  apt -q -qq update && apt install -y --allow-unauthenticated \
   net-tools \
   ntpdate \
   python3-pip \
-  v4l-utils \ 
+  v4l-utils \
   gstreamer1.0-tools 
+
 
   
 RUN apt install python-is-python3
