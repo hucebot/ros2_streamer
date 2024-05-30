@@ -18,9 +18,7 @@ RUN  apt -q -qq update && apt install -y --allow-unauthenticated \
   ntpdate \
   python3-pip \
   v4l-utils \ 
-  gstreamer1.0-tools \
-  v4l2-ctl
-
+  gstreamer1.0-tools 
 
   
 RUN apt install python-is-python3
@@ -28,7 +26,7 @@ RUN apt install python-is-python3
 RUN pip install v4l2py
 
 RUN echo "source /ros2_ws/install/setup.bash" >> /root/.bashrc
+COPY run_ros2_streamer.sh /run_ros2_streamer.sh
 
 
-
-CMD ["bash"]
+CMD ["/run_ros2_streamer.sh"]
