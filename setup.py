@@ -11,6 +11,8 @@ setup(
             ['resource/' + package_name]),
         ('lib/' + package_name, [package_name+'/v4l2.py']),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name, ['launch/gstreamer_launch.py']),
+        ('share/' + package_name + '/config', ['config/gstreamer_config.yaml']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

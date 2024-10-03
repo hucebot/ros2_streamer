@@ -34,9 +34,10 @@ class GstreamerService(Node):
         self.get_logger().info('Gstreamer service is starting...')
 
         # parameters
+        self.declare_parameter('camera_name', 'insta360')
         self.declare_parameter('rtp_port', 5000)
-        self.declare_parameter('rtp_dest', '192.168.1.117')
-        self.declare_parameter('device', '/dev/video0')
+        self.declare_parameter('rtp_dest', '192.168.50.16') #192.168.1.117
+        self.declare_parameter('device', '/dev/video1')
         self.declare_parameter('ntp_server', 'time.apple.com')
         self.declare_parameter('bitrate', 1000)
         self.declare_parameter('local_time_frequency', 10)
@@ -257,10 +258,18 @@ class GstreamerService(Node):
 
         rtp_dest = self.get_parameter('rtp_dest').get_parameter_value().string_value
         rtp_port = self.get_parameter('rtp_port').get_parameter_value().integer_value
+
+        if self.get_parameter('camera_name').get_parameter_value().string_value == 'insta360':
+            
+            pipeline_string = f"v4l2src device={device}  ! video/x-h264,width=1280,height=720 \
+            ! rtph264pay  \
+            ! udpsink host={rtp_dest} port={rtp_port} sync=true async=false"
         
-        pipeline_string = f"v4l2src device={device}  ! video/x-h264,width=1280,height=720 \
-        ! rtph264pay  \
-        ! udpsink host={rtp_dest} port={rtp_port} sync=true async=false"
+        if self.get_parameter('camera_name').get_parameter_value().string_value == 'c930e':
+
+            pipeline_string = f"v4l2src device={device}  ! image/jpeg,width=1280,height=720 \
+                ! jpegdec ! videoconvert ! x264enc tune=zerolatency  speed-preset=superfast \
+                ! rtph264pay ! udpsink host={rtp_dest} port={rtp_port}"
 
         print("Gstreamer pipeline:", pipeline_string.replace("\n"," "))
         self.pipeline = None
@@ -276,7 +285,6 @@ class GstreamerService(Node):
             print(e)
             return
         self.get_logger().info('Gstreamer OK')
-
 
 
 def main():
