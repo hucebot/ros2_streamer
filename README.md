@@ -16,3 +16,7 @@ A gstreamer launch interface with ROS2 services
 - rtp_port: 5000
 - source: videotestsrc pattern=ball is-live=true
 - use_sim_time: false
+
+# IMPORTANT FOR INSTA360
+- `echo -1 > /sys/module/usbcore/parameters/autosuspend`
+
