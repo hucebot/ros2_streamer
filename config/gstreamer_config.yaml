@@ -1,5 +1,5 @@
 # General configuration
-ip_host: 192.168.50.63
+ip_host: 192.168.50.77
 ntp_server: time.apple.com
 bitrate: 1000
 local_time_frequecy: 10
@@ -11,13 +11,5 @@ cameras:
     name: insta360
     port: 5000
     usb_port: /dev/video1
+    pan_tilt: true
     
-  camera_2:
-    name: c930e
-    port: 5001
-    usb_port: /dev/video3
-
-  camera_3:
-    name: c930e
-    port: 5002
-    usb_port: /dev/video5
