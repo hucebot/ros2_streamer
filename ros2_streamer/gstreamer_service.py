@@ -35,6 +35,7 @@ class GstreamerService(Node):
 
         # parameters
         self.declare_parameter('camera_name', 'insta360')
+        self.declare_parameter('pan_tilt', False)
         self.declare_parameter('rtp_port', 5000)
         self.declare_parameter('rtp_dest', '192.168.50.16') #192.168.1.117
         self.declare_parameter('device', '/dev/video1')
@@ -44,13 +45,15 @@ class GstreamerService(Node):
         self.declare_parameter('pan_tilt_frequency', 10)
         self.add_on_set_parameters_callback(self.parameters_callback)
 
-
-        # ini video for linux
         self.is_pantilt = False
-        self._init_v4l() # this is only for pan-tilt support
 
-        # ros needs to know if pan-tilt 
-        self._init_ros()
+        if self.get_parameter('pan_tilt').get_parameter_value().string_value == 'true':
+            # ini video for linux
+            self.is_pantilt = True
+            self._init_v4l() # this is only for pan-tilt support
+
+            # ros needs to know if pan-tilt 
+            self._init_ros()
 
         # init gstreamer
         self._init_gstreamer()

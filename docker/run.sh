@@ -1,5 +1,6 @@
 #!/bin/bash
 
+docker rm ros2_streamer
 docker run  \
     --name ros2_streamer  \
     --net host \

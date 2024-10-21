@@ -12,7 +12,7 @@ def generate_launch_description():
     )
 
     with open(config_file, 'r') as file:
-        config = yaml.safe_load(file)  # Cambia a safe_load por seguridad
+        config = yaml.safe_load(file)
 
     print(config)
 
@@ -29,17 +29,18 @@ def generate_nodes(config_file):
     pan_tilt_frequency = config_file['pan_tilt_frequency']
 
     for camera_key in config_file['cameras']:
-        camera = config_file['cameras'][camera_key]  # Accede a la información de la cámara
+        camera = config_file['cameras'][camera_key]
         
         list_of_nodes.append(Node(
             package='ros2_streamer',
-            executable='service',  # Asegúrate de que el nombre del ejecutable sea correcto
+            executable='service',
             name='gstreamer_service_' + camera['name'],
             output='screen',
             parameters=[
                 {'camera_name': camera['name']},
+                {'pan_tilt': camera['pan_tilt']},
                 {'rtp_port': camera['port']},
-                {'rtp_dest': ip_host},  # Asegúrate de usar 'ip_host' en lugar de 'rtp_dest'
+                {'rtp_dest': ip_host},
                 {'device': camera['usb_port']},
                 {'ntp_server': ntp_server},
                 {'bitrate': bitrate},
