@@ -46,8 +46,7 @@ class GstreamerService(Node):
         self.add_on_set_parameters_callback(self.parameters_callback)
 
         self.is_pantilt = False
-
-        if self.get_parameter('pan_tilt').get_parameter_value().string_value == 'true':
+        if self.get_parameter('pan_tilt').get_parameter_value().bool_value == True:
             # ini video for linux
             self.is_pantilt = True
             self._init_v4l() # this is only for pan-tilt support
@@ -67,7 +66,7 @@ class GstreamerService(Node):
 
     def _init_ros(self):
         device = self.get_parameter('device').get_parameter_value().string_value.split('/')[-1]
-        name = self.get_name()
+        name = self.get_name().replace("_"+self.get_parameter('camera_name').get_parameter_value().string_value, "")
 
         # publisher : clock
         self.ntp_sync(self.get_parameter('ntp_server').get_parameter_value().string_value)
