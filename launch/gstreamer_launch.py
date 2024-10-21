@@ -38,6 +38,8 @@ def generate_nodes(config_file):
             output='screen',
             parameters=[
                 {'camera_name': camera['name']},
+                {'width': camera['width']},
+                {'height': camera['height']},
                 {'pan_tilt': camera['pan_tilt']},
                 {'rtp_port': camera['port']},
                 {'rtp_dest': ip_host},

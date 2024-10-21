@@ -12,4 +12,6 @@ cameras:
     port: 5000
     usb_port: /dev/video1
     pan_tilt: true
+    width: 1280
+    height: 720
     
