@@ -45,7 +45,7 @@ class GstreamerService(Node):
         self.declare_parameter('pan_tilt_frequency', 10)
         self.declare_parameter('width', 1280)
         self.declare_parameter('height', 720)
-        self.add_on_set_parameters_callback(self.parameters_callback)
+        
 
         self.is_pantilt = False
         if self.get_parameter('pan_tilt').get_parameter_value().bool_value == True:
@@ -55,6 +55,8 @@ class GstreamerService(Node):
 
             # ros needs to know if pan-tilt 
             self._init_ros()
+
+        self.add_on_set_parameters_callback(self.parameters_callback)
 
         # init gstreamer
         self._init_gstreamer()
@@ -158,7 +160,7 @@ class GstreamerService(Node):
         if not self.is_pantilt:
             self.get_logger().error("No pan/tilt capability!")
             return
-
+        print(msg.data)
         control = v4l2.v4l2_control()
         control.id = v4l2.V4L2_CID_PAN_ABSOLUTE
         if msg.data > 100:
@@ -179,7 +181,7 @@ class GstreamerService(Node):
         if not self.is_pantilt:
             self.get_logger().error("No pan/tilt capability!")
             return
-
+        
         control = v4l2.v4l2_control()
         control.id = v4l2.V4L2_CID_TILT_ABSOLUTE
         if msg.data > 100:
@@ -236,22 +238,21 @@ class GstreamerService(Node):
             fcntl.ioctl(self.video_device, v4l2.VIDIOC_QUERYCAP, cp)
             print(cp.driver, cp.card,  cp.capabilities)
 
-            if cp.capabilities & v4l2.V4L2_CID_PAN_ABSOLUTE and cp.capabilities & v4l2.V4L2_CID_TILT_ABSOLUTE:
-                self.is_pantilt = True
-            
-                control = v4l2.v4l2_queryctrl()
-                control.id = v4l2.V4L2_CID_PAN_ABSOLUTE
-                fcntl.ioctl(self.video_device, v4l2.VIDIOC_QUERYCTRL, control)
-                self.min_pan = control.minimum
-                self.max_pan = control.maximum
-                self.step_pan = control.step
+            self.is_pantilt = True
+        
+            control = v4l2.v4l2_queryctrl()
+            control.id = v4l2.V4L2_CID_PAN_ABSOLUTE
+            fcntl.ioctl(self.video_device, v4l2.VIDIOC_QUERYCTRL, control)
+            self.min_pan = control.minimum
+            self.max_pan = control.maximum
+            self.step_pan = control.step
 
-                control = v4l2.v4l2_queryctrl()
-                control.id = v4l2.V4L2_CID_TILT_ABSOLUTE
-                fcntl.ioctl(self.video_device, v4l2.VIDIOC_QUERYCTRL, control)
-                self.min_tilt = control.minimum
-                self.max_tilt = control.maximum
-                self.step_tilt = control.step
+            control = v4l2.v4l2_queryctrl()
+            control.id = v4l2.V4L2_CID_TILT_ABSOLUTE
+            fcntl.ioctl(self.video_device, v4l2.VIDIOC_QUERYCTRL, control)
+            self.min_tilt = control.minimum
+            self.max_tilt = control.maximum
+            self.step_tilt = control.step
 
         except Exception as e:
             print("ERROR initializng v4l2", e)
