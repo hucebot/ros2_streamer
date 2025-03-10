@@ -28,5 +28,3 @@ RUN pip install v4l2py
 
 RUN echo "source /ros2_ws/install/setup.bash" >> /root/.bashrc
 COPY run_ros2_streamer.sh /run_ros2_streamer.sh
-
-CMD ["/bin/bash", "-c", "source /ros2_ws/install/setup.bash && ros2 launch ros2_streamer gstreamer_launch.py"]

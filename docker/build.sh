@@ -1,1 +1,1 @@
-docker build . -t ros2_streamer:2024.05
+docker build . -t ros2_streamer

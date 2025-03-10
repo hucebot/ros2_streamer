@@ -9,6 +9,6 @@ docker run  \
     --privileged \
     -it \
     -v /dev:/dev \
-    -v $HOME/ros2_ws:/ros2_ws \
+    -v `pwd`/../../ros2_streamer/:/ros2_ws/src/ros2_streamer \
     -w /ros2_ws \
-    ros2_streamer:latest
+    ros2_streamer
