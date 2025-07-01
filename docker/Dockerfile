@@ -1,4 +1,4 @@
-FROM ros:humble
+FROM ros:humble-ros-base
 ENV ROS_DISTRO humble
 
 LABEL maintainer="jean-baptiste.mouret@inria.fr"
