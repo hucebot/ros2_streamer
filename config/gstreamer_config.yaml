@@ -1,5 +1,5 @@
 # General configuration
-ip_host: 192.168.8.167 # IP address of the camera host
+ip_host: 192.168.8.156
 ntp_server: time.apple.com
 bitrate: 1000
 local_time_frequecy: 10
@@ -10,7 +10,7 @@ cameras:
   camera_1:
     name: c930e
     port: 5000
-    usb_port: /dev/video2
+    usb_port: /dev/video0
     pan_tilt: false
     width: 1280
     height: 720
